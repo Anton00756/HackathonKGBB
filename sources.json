@@ -1,0 +1,32 @@
+{
+    "sources": [
+        {
+            "path": "sources",
+            "module": "banki_ru_source",
+            "class": "BankiRuSource",
+            "work_path": "../local_data/reviews_banki.json"
+        },
+        {
+            "path": "sources",
+            "module": "sravni_ru_source",
+            "class": "SravniRuSource",
+            "work_path": "../local_data/reviews_sravni.json"
+        },
+        {
+            "path": "sources",
+            "module": "txt_source",
+            "class": "TxtSource1",
+            "work_path": "../local_data/text.txt"
+        },
+        {
+            "path": "sources",
+            "module": "fake_module_name",
+            "class": "TxtSource"
+        },
+        {
+            "path": "sources",
+            "module": "txt_source",
+            "class": "FakeTXT"
+        }
+    ]
+}
