@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  grafana:
+    image: grafana/grafana:10.1.2
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      TZ: "Europe/Moscow"
+    networks:
+      - node-network
+
+  influxdb:
+    image: influxdb:2
+    container_name: influx
+    restart: unless-stopped
+    ports:
+      - "8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: influx_admin
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: influx_admin
+      DOCKER_INFLUXDB_INIT_ORG: KGBB
+      DOCKER_INFLUXDB_INIT_BUCKET: metrics
+    volumes:
+      - influxdb_data:/etc/influxdb2
+      - influxdb_config:/var/lib/influxdb2
+    networks:
+      - node-network
+
+volumes:
+  grafana_data:
+    driver: local
+  influxdb_config:
+    driver: local
+  influxdb_data:
+    driver: local
+
+networks:
+  node-network:
+    driver: bridge
