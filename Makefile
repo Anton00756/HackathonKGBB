@@ -3,9 +3,9 @@ shared = true
 
 up: down delete_trash
     ifeq ($(shared), true)
-		@docker-compose -f=docker_files/docker-compose-shared.yaml -p kgbb up -d
+		@docker-compose --env-file .env -f=docker_files/docker-compose-shared.yaml -p kgbb up -d
     else
-		@docker-compose -f=docker_files/docker-compose.yaml -p kgbb up -d
+		@docker-compose --env-file .env -f=docker_files/docker-compose.yaml -p kgbb up -d
     endif
 
 down:
