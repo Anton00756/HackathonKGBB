@@ -15,10 +15,6 @@ load_dotenv('../.env')
 LOGGER = utils.get_logger()
 
 if __name__ == '__main__':
-    os.environ['GRPC_VERBOSITY'] = 'ERROR'
-    os.environ['GLOG_minloglevel'] = '2'
-    # hide warning from Yandex GPT manager
-
     with open(os.environ['PATH_TO_SOURCES'], 'r', encoding='utf-8') as file:
         sources_list = json.load(file)
     sources: dict[str, BaseSource] = {}
@@ -74,10 +70,8 @@ if __name__ == '__main__':
 
         metrics = InfluxMetrics(os.environ['INFLUX_URL'], os.environ['INFLUX_TOKEN'], os.environ['INFLUX_ORG'],
                                 os.environ['INFLUX_BUCKET'])
-        # TODO: вычисление индекса
         metrics.update_metrics(claim_count, offer_count, gratitude_count, financial_claim_count, financial_offer_count,
-                               worker_error_count, disagreement_count, bug_count, speed_count, index=0,
-                               source_metrics=source_metrics)
+                               worker_error_count, disagreement_count, bug_count, speed_count, source_metrics)
     except Exception:
         LOGGER.error(f'Error in reviews classification:\n{traceback.format_exc()}')
         exit(-1)
