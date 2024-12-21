@@ -1,6 +1,20 @@
 version: "3.9"
 
 services:
+  kernel:
+    image: kgbb/kernel:latest
+    container_name: kernel
+    restart: unless-stopped
+    networks:
+      - node-network
+    depends_on:
+      - grafana
+      - influxdb
+    entrypoint: [ 'sleep', '10000s' ]
+    environment:
+      CONTAINER_LOGGING: true
+      INFLUX_URL: http://influx:8086
+
   grafana:
     image: grafana/grafana:10.1.2
     container_name: grafana

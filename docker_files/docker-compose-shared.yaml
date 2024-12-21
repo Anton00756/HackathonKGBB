@@ -1,6 +1,13 @@
 version: "3.9"
 
 services:
+  kernel:
+    extends:
+      file: docker-compose.yaml
+      service: kernel
+    volumes:
+      - ${PWD}:/work_dir
+
   grafana:
     extends:
       file: docker-compose.yaml

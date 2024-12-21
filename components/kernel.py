@@ -46,7 +46,7 @@ if __name__ == '__main__':
         for number, review in enumerate(reviews, 1):
             if (review_type := classifier.get_review_type(review)) == ReviewType.GRATITUDE:
                 gratitude_count += 1
-                LOGGER.error(f'Reviewed: {number}/{len(reviews)}')
+                LOGGER.info(f'Reviewed: {number}/{len(reviews)}')
                 continue
             if review_type == ReviewType.FINANCIAL_CLAIM:
                 financial_claim_count += 1
@@ -66,10 +66,10 @@ if __name__ == '__main__':
                 bug_count += 1
             else:
                 speed_count += 1
-            LOGGER.error(f'Reviewed: {number}/{len(reviews)}')
+            LOGGER.info(f'Reviewed: {number}/{len(reviews)}')
 
-        metrics = InfluxMetrics(os.environ['INFLUX_URL'], os.environ['INFLUX_TOKEN'], os.environ['INFLUX_ORG'],
-                                os.environ['INFLUX_BUCKET'])
+        metrics = InfluxMetrics(os.environ.get('INFLUX_URL', 'http://localhost:8086'), os.environ['INFLUX_TOKEN'],
+                                os.environ['INFLUX_ORG'], os.environ['INFLUX_BUCKET'])
         metrics.update_metrics(claim_count, offer_count, gratitude_count, financial_claim_count, financial_offer_count,
                                worker_error_count, disagreement_count, bug_count, speed_count, source_metrics)
     except Exception:

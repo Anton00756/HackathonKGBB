@@ -17,3 +17,9 @@ delete_trash:
 
 clear_metrics:
 	@docker exec -it influx influx delete --org KGBB --bucket metrics --start 2000-01-01T00:00:00Z --stop 2100-01-01T00:00:00Z
+
+build_kernel:
+	@docker build -t kgbb/kernel:latest -f docker_files/kernel/Dockerfile .
+
+run:
+	@docker exec kernel sh -c "cd /work_dir/components/ && python3 kernel.py"

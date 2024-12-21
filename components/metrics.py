@@ -29,8 +29,9 @@ class InfluxMetrics:
         self.data['sum_index'] += claim_count + offer_count * 4 + gratitude_count * 10
         self.data['total_count'] += claim_count + offer_count * 0.5 + gratitude_count
         if self.data['total_count']:
-            self.add_record(influxdb_client.Point("index").field("mark", self.data['sum_index'] /
-                                                                 self.data['total_count']))
+            self.add_record(influxdb_client.Point("index_value").field(
+                "mark", float(self.data['sum_index'] / self.data['total_count']))
+            )
         with open(self.save_path, 'w', encoding='utf-8') as file:
             json.dump(self.data, file, indent=4, ensure_ascii=False)
 

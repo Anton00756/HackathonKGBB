@@ -7,7 +7,7 @@ def get_logger():
     logger = logging.getLogger(__file__)
     logger.setLevel(level)
     if not logger.handlers:
-        if os.environ.get('CONTAINER_LOGGING', 'false') == 'true':  # TODO: set for docker
+        if os.environ.get('CONTAINER_LOGGING', 'false') == 'true':
             handler = logging.FileHandler('/var/log/container_logs.log')
         else:
             handler = logging.StreamHandler()
