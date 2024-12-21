@@ -15,24 +15,31 @@ load_dotenv('../.env')
 LOGGER = utils.get_logger()
 
 if __name__ == '__main__':
+    os.environ['GRPC_VERBOSITY'] = 'ERROR'
+    os.environ['GLOG_minloglevel'] = '2'
+    # hide warning from Yandex GPT manager
+
     with open(os.environ['PATH_TO_SOURCES'], 'r', encoding='utf-8') as file:
         sources_list = json.load(file)
-    sources: list[BaseSource] = []
-    for source in sources_list['sources']:
+    sources: dict[str, BaseSource] = {}
+    for index, source in enumerate(sources_list['sources']):
         if os.path.exists(source['path']):
             if source['path'] not in sys.path:
                 sys.path.append(source['path'])
             try:
                 module = importlib.import_module(source['module'])
-                sources.append(getattr(module, source['class'])(source.get('work_path', '.')))
+                sources[source.get('source_name_in_metrics', f'source_{index}')] = \
+                    getattr(module, source['class'])(source.get('work_path', '.'))
             except ModuleNotFoundError:
                 LOGGER.error(f'Module "{source["module"]}" was not found in path "{source["path"]}"')
             except AttributeError:
                 LOGGER.error(f'Class "{source["class"]}" was not found in module "{source["module"]}"')
     reviews = []
-    for source in sources:
+    source_metrics = {}
+    for metrics_name, source in sources.items():
         try:
-            reviews.extend(source.get_new_reviews())
+            reviews.extend(source_reviews := source.get_new_reviews())
+            source_metrics[metrics_name] = len(source_reviews)
         except Exception:
             LOGGER.error(f'Error in reviews loading of source "{source.__class__.__name__}":\n{traceback.format_exc()}')
     LOGGER.info(f'Reviews for classification: {len(reviews)}')
@@ -43,6 +50,7 @@ if __name__ == '__main__':
         for number, review in enumerate(reviews, 1):
             if (review_type := classifier.get_review_type(review)) == ReviewType.GRATITUDE:
                 gratitude_count += 1
+                LOGGER.error(f'Reviewed: {number}/{len(reviews)}')
                 continue
             if review_type == ReviewType.FINANCIAL_CLAIM:
                 financial_claim_count += 1
@@ -68,12 +76,13 @@ if __name__ == '__main__':
                                 os.environ['INFLUX_BUCKET'])
         # TODO: вычисление индекса
         metrics.update_metrics(claim_count, offer_count, gratitude_count, financial_claim_count, financial_offer_count,
-                               worker_error_count, disagreement_count, bug_count, speed_count, index=0)
+                               worker_error_count, disagreement_count, bug_count, speed_count, index=0,
+                               source_metrics=source_metrics)
     except Exception:
         LOGGER.error(f'Error in reviews classification:\n{traceback.format_exc()}')
         exit(-1)
 
-    for source in sources:
+    for source in sources.values():
         try:
             source.update_last_review()
         except Exception:

@@ -18,7 +18,7 @@ class InfluxMetrics:
 
     def update_metrics(self, claim_count: int, offer_count: int, gratitude_count: int, financial_claim_count: int,
                        financial_offer_count: int, worker_error_count: int, disagreement_count: int, bug_count: int,
-                       speed_count: int, index: float):
+                       speed_count: int, index: float, source_metrics: dict):
         self.add_record(influxdb_client.Point("count_diffs").tag("type", "claim_count").field("count", claim_count))
         self.add_record(influxdb_client.Point("count_diffs").tag("type", "offer_count").field("count", offer_count))
         self.add_record(influxdb_client.Point("count_diffs").tag("type", "gratitude_count")
@@ -40,3 +40,5 @@ class InfluxMetrics:
         self.add_record(influxdb_client.Point("reason_count_diffs").tag("type", "bug").field("count", bug_count))
         self.add_record(influxdb_client.Point("reason_count_diffs").tag("type", "speed").field("count", speed_count))
         self.add_record(influxdb_client.Point("index").field("mark", index))
+        for name, count in source_metrics.items():
+            self.add_record(influxdb_client.Point("source_count_diffs").tag("source", name).field("count", count))
